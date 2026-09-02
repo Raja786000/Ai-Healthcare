@@ -1,0 +1,174 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a6b57"><link rel="manifest" href="/manifest.webmanifest"><link rel="stylesheet" href="/styles.css"><title>HealthBridge AI — Care, explained simply</title></head><body>
+
+<!-- ===== ASSESSMENT WIZARD MODAL ===== -->
+<div id="wizardOverlay" class="wizard-overlay" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+  <div class="wizard-panel">
+    <div class="wiz-header">
+      <div>
+        <div class="eyebrow">HEALTH ASSESSMENT</div>
+        <h2 id="wizardTitle">Patient-Friendly Assessment</h2>
+      </div>
+      <button class="icon-btn" id="wizardClose" aria-label="Close assessment">✕</button>
+    </div>
+    <div class="wiz-progress-bar"><div id="wizProgress" style="width:0%"></div></div>
+    <div id="wizStepLabel" class="wiz-step-label">Step 1 of 4 — Symptom Intake</div>
+    <div id="wizSteps" class="wiz-steps"></div>
+    <div id="wizBody" class="wiz-body"></div>
+    <p class="wiz-disclaimer">HealthBridge provides health awareness only — not diagnosis or prescriptions. Emergency warning signs are checked first.</p>
+  </div>
+</div>
+
+<div class="app-shell">
+<header class="topbar"><div class="brand"><div class="brand-mark">✚</div><div><div class="brand-name">Health<span>Bridge</span> AI</div><div class="brand-sub">Awareness • Prevention • Access</div></div></div><div class="top-actions"><div class="status"><i></i><span id="mode">Connecting…</span></div><button class="icon-btn" id="themeBtn" title="Toggle theme">☾</button><select id="lang" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="pa">ਪੰਜਾਬੀ</option><option value="bn">বাংলা</option><option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="mr">मराठी</option><option value="gu">ગુજરાતી</option></select></div></header>
+<main>
+
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow">AI FOR HEALTHCARE ACCESS</div>
+    <h1>Understand your health.<br><em>Take the next safe step.</em></h1>
+    <p>HealthBridge turns confusing health questions into simple, source-backed guidance — then helps you find the right pathway to care.</p>
+    <div class="hero-actions">
+      <button class="primary" id="openAssessmentBtn">📋 Start Assessment</button>
+      <button class="secondary" id="startCheck">🩺 Quick symptom check</button>
+      <button class="secondary" id="voiceBtn">🎙 Voice question</button>
+    </div>
+    <div class="hero-stats"><span><b>8</b> languages</span><span><b>9</b> safety agents</span><span><b>4-step</b> assessment</span><span><b>24/7</b> local demo</span></div>
+  </div>
+  <div class="hero-card">
+    <div class="hero-card-top"><span>YOUR SAFETY FIRST</span><b>● LIVE</b></div>
+    <div class="big-icon">🛡️</div>
+    <h3>Not a doctor. A safer guide.</h3>
+    <p>Emergency signals are checked before AI generation. Sources and next steps stay visible.</p>
+    <div class="mini-flow"><span>Intake</span><i>→</i><span>Safety</span><i>→</i><span>Evidence</span><i>→</i><span>Care Plan</span></div>
+    <button class="assess-hero-btn" id="openAssessmentBtn2">📋 Start health assessment →</button>
+  </div>
+</section>
+
+<section class="quick-grid" id="topicGrid"></section>
+
+<section class="workspace" id="assistant">
+  <div class="chat-wrap">
+    <div class="chat-header">
+      <div><div class="chat-title">HealthBridge Assistant</div><div class="chat-sub">Plain-language health information + care navigation</div></div>
+      <div class="chat-head-actions"><button class="round" id="clearBtn" title="Clear conversation">↺</button></div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="composer-tools">
+      <button data-q="What are simple ways to prevent common illness?">🌱 Prevention</button>
+      <button data-q="How can I check my vaccination needs?">💉 Vaccines</button>
+      <button data-q="What should I know about pregnancy care?">🤱 Pregnancy</button>
+      <button data-q="How can I find telemedicine care?">📍 Find care</button>
+      <button data-q="How can I support my mental wellbeing?">🧠 Wellbeing</button>
+    </div>
+    <form id="chatForm"><textarea id="input" rows="1" placeholder="Ask a health question…" aria-label="Health question"></textarea><button class="send" type="submit">↑</button></form>
+    <div class="safety-note">HealthBridge provides general information, not diagnosis or prescriptions. <button class="text-link" onclick="openAssessment()">📋 Full assessment →</button></div>
+  </div>
+  <aside class="insights">
+    <div class="side-card risk-card">
+      <div class="side-head"><span>SAFETY STATUS</span><b id="riskBadge">ROUTINE</b></div>
+      <div class="risk-meter"><div id="riskFill" class="risk-fill routine"></div></div>
+      <div class="next-step" id="nextStep">Your safety status will appear here.</div>
+    </div>
+    <div class="side-card">
+      <div class="side-head"><span>AGENT TRACE</span><b id="agentCount">9 agents</b></div>
+      <div class="trace" id="trace"></div>
+    </div>
+    <div class="side-card">
+      <div class="side-head"><span>SOURCES</span><button class="text-btn" id="sourcesBtn">Expand</button></div>
+      <div class="sources" id="sources"></div>
+    </div>
+  </aside>
+</section>
+
+<section class="feature-section">
+  <div class="section-heading">
+    <div><div class="eyebrow">SMART TRIAGE</div><h2>Check urgency in 30 seconds</h2></div>
+    <p>A guided safety check asks about severity, duration and warning signs. It does not diagnose the cause.</p>
+  </div>
+  <div class="triage-grid">
+    <div class="triage-form">
+      <label>What are you experiencing?<textarea id="triageSymptoms" placeholder="Example: fever and cough since yesterday"></textarea></label>
+      <div class="field-row">
+        <label>How long?<select id="triageDuration"><option>today</option><option>1-2 days</option><option>3-7 days</option><option>more than 1 week</option></select></label>
+        <label>Severity <span id="severityValue">3/5</span><input id="triageSeverity" type="range" min="1" max="5" value="3"></label>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" value="breathing difficulty"> Severe breathing difficulty</label>
+        <label><input type="checkbox" value="unconsciousness"> Unconscious / not responding</label>
+        <label><input type="checkbox" value="severe chest pain"> Severe chest pain</label>
+        <label><input type="checkbox" value="heavy bleeding"> Heavy bleeding</label>
+      </div>
+      <button class="primary" id="runTriage">Run safety check</button>
+      <button class="secondary" style="margin-top:8px" onclick="openAssessment()">📋 Full assessment instead</button>
+    </div>
+    <div class="triage-result" id="triageResult">
+      <div class="empty-icon">🧭</div>
+      <h3>Your next step will appear here</h3>
+      <p>Use the form to get a safety-oriented action level.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature-section">
+  <div class="section-heading">
+    <div><div class="eyebrow">PREVENTION STUDIO</div><h2>Build a personal prevention routine</h2></div>
+    <p>Choose a goal and age group. HealthBridge turns it into a practical checklist you can save locally.</p>
+  </div>
+  <div class="plan-controls">
+    <div class="goal-pills">
+      <button data-goal="daily wellness">🌿 Daily wellness</button>
+      <button data-goal="vaccination">💉 Vaccination</button>
+      <button data-goal="maternal & child">🤱 Mother & child</button>
+      <button data-goal="mental wellbeing">🧠 Mental wellbeing</button>
+      <button data-goal="respiratory health">🫁 Respiratory</button>
+      <button data-goal="heart health">❤️ Heart health</button>
+      <button data-goal="diabetes prevention">🩸 Diabetes prevention</button>
+    </div>
+    <select id="ageGroup"><option value="adult">Adult</option><option value="child">Child</option><option value="pregnant">Pregnant</option><option value="older adult">Older adult</option></select>
+  </div>
+  <div id="plan" class="plan hidden"></div>
+</section>
+
+<section class="feature-section">
+  <div class="section-heading">
+    <div><div class="eyebrow">CARE NAVIGATOR</div><h2>Turn information into access</h2></div>
+    <p>Use official services first. Add your city to open a local map pathway.</p>
+  </div>
+  <div class="nav-form">
+    <input id="city" placeholder="City"><input id="state" placeholder="State">
+    <select id="service"><option>general healthcare</option><option>government hospital</option><option>clinic</option><option>maternal child healthcare</option><option>telemedicine</option><option>emergency department</option></select>
+    <button class="dark-btn" id="findCare">Find care</button>
+  </div>
+  <div id="resourceCards" class="resource-grid"></div>
+</section>
+
+<section class="knowledge">
+  <div class="section-heading">
+    <div><div class="eyebrow">HEALTH LITERACY</div><h2>Learn before you decide</h2></div>
+    <div class="search-wrap">⌕ <input id="knowledgeSearch" placeholder="Search trusted health topics…"></div>
+  </div>
+  <div id="knowledgeGrid" class="knowledge-grid"></div>
+</section>
+
+<section class="responsible">
+  <div>
+    <div class="eyebrow">RESPONSIBLE AI</div>
+    <h2>Built around safety, not diagnosis.</h2>
+    <p>HealthBridge separates safety checks from generation, retrieves curated evidence, exposes the agent trace, and routes users toward human care when needed.</p>
+  </div>
+  <div class="principles">
+    <span>✓ 4-step assessment</span><span>✓ Safety gate</span><span>✓ Evidence retrieval</span><span>✓ Human escalation</span><span>✓ Multilingual (8)</span><span>✓ No dosing</span><span>✓ Source visibility</span><span>✓ Local-first demo</span><span>✓ Privacy-conscious</span>
+  </div>
+</section>
+</main>
+<footer>SkillUp Hackathon × IBM SkillsBuild · AI for Impact · HealthBridge AI</footer>
+</div>
+<script>
+// Second hero button alias
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.getElementById('openAssessmentBtn2');
+  if(b)b.onclick=()=>typeof openAssessment==='function'&&openAssessment();
+});
+</script>
+<script src="/app.js"></script>
+</body></html>
